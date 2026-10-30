@@ -1,0 +1,80 @@
+---
+name: quiz-me
+description: Quiz the developer on the changes in their current branch before they open a PR, and record the questions and answers to a file. Use when the user runs /quiz-me or asks to be quizzed on their branch's changes.
+---
+
+# Quiz Me
+
+Quiz the developer on the pending changes in their current branch to check their comprehension of the code, then record every question and answer to a file.
+
+In the commands below, `BASE` means the base branch found in Step 0.
+
+## Step 0: Preflight checks
+
+1. **Get the current branch:** `git branch --show-current`. If it's empty (detached HEAD) or is the base branch itself, tell the user to switch to their feature branch and stop.
+2. **Find the base branch:** try `git symbolic-ref refs/remotes/origin/HEAD`. If that fails, use `main` if it exists, else `master`. If neither exists, ask the user.
+3. **Check for uncommitted work:** `git status --porcelain`. If there's any output, list the files and ask: "These changes aren't committed and won't be included in the quiz. Commit them first, or continue anyway?"
+4. **Check there's something to quiz on:** if `git diff BASE...HEAD` is empty, tell the user and stop.
+
+## Step 1: Gather context
+
+Gather everything before asking questions, and show none of it to the developer. Base everything on the code itself.
+
+1. **Overview:** `git diff --stat BASE...HEAD`. Skip lockfiles, generated files, binaries, and vendored code from here on.
+2. **The changes:** `git diff BASE...HEAD`.
+3. **Full files:** read the current version of every changed file in full. For deleted files, rely on the diff.
+4. **Callers:** for each added or modified function, class, or method, search the repo for where it's called, excluding its own definition.
+5. **Dependencies:** for the key changed functions, open the definitions of functions they call when needed to understand an assumption or invariant.
+
+## Step 2: Ask the questions
+
+Each question has two parts:
+
+- **[generic]:** the base question, worded roughly the same on every branch.
+- **[context-specific]:** a follow-up you build from the Step 1 context, naming a real input, choice, or edge case from this diff.
+
+Ask the generic part first, wait for the answer, then ask the context-specific part.
+
+### What
+- **[generic]** What does it do? Explain the general functionality and then trace what happens from input to output.
+- **[context-specific]** Pick a specific input from the diff and ask what the code does in that case. Example: "What does `export_csv()` return when the table has zero rows?"
+
+### Why
+- **[generic]** Why this design over reasonable alternatives? Explain key design decisions.
+- **[context-specific]** Pick a specific design choice in the diff and name a real alternative. Example: "Why does it load all rows into memory instead of streaming them?"
+
+### Failure
+- **[generic]** How can it fail? What would the user see?
+- **[context-specific]** Pick a specific edge case or changed assumption and ask what happens. Example: "What happens if a cell contains a newline?"
+
+### Upstream Dependency
+- **[generic]** What key invariants, assumptions, or functions does it rely on?
+
+### Side effects
+- **[generic]** Besides its main purpose, what else does this change do? Does it modify existing functions, change shared settings or data, or touch files outside the feature?
+- Goal: check that the developer knows whether the agent changed code beyond their main request, perhaps unnecessarily.
+
+### Asking rules
+- Ask in plain text, one question at a time, and wait for the answer before the next.
+- Do not use the AskUserQuestion tool.
+- Absolutely no hints, options, or example answers.
+
+## Step 3: Record the results
+
+1. **File name:** `comp_check_[branch name].md` at the repo root, with `/` replaced by `-`.
+2. **Header:**
+   ```
+   # Comprehension check: [branch name]
+   Base: [base branch] | Commit: [short HEAD hash] | Date: [date and time]
+   Files covered: [list]
+   ```
+3. **Body:**
+   ```
+   Q: ....
+   A: ....
+
+   Q: ....
+   A: ....
+   ```
+   Record questions exactly as asked and answers exactly as typed.
+   Note: Write as you go: append each pair right after it's answered.
