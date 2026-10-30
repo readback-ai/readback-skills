@@ -1,11 +1,11 @@
 ---
 name: quiz-me
-description: Quiz the developer on the changes in their current branch before they open a PR, and record the questions and answers to a file. Use when the user runs /quiz-me or asks to be quizzed on their branch's changes.
+description: Quiz the developer on the changes in their current branch before they open a PR, record the questions and answers to a file, then grade the answers and give feedback. Use when the user runs /quiz-me or asks to be quizzed on their branch's changes.
 ---
 
 # Quiz Me
 
-Quiz the developer on the pending changes in their current branch to check their comprehension of the code, then record every question and answer to a file.
+Quiz the developer on the pending changes in their current branch to check their comprehension of the code, record every question and answer to a file, then grade the answers and give feedback.
 
 In the commands below, `BASE` means the base branch found in Step 0.
 
@@ -26,7 +26,14 @@ Gather everything before asking questions, and show none of it to the developer.
 4. **Callers:** for each added or modified function, class, or method, search the repo for where it's called, excluding its own definition.
 5. **Dependencies:** for the key changed functions, open the definitions of functions they call when needed to understand an assumption or invariant.
 
-## Step 2: Ask the questions
+## Step 2: Write the answer key
+
+Before asking anything, plan every question in Step 3, including the specific input, design choice, or edge case for each context-specific part. Then write the ideal answer to each question.
+
+- Base each ideal answer on the code itself, citing `file:line` for every claim.
+- Keep the answer key private. Do not show it to the developer, and do not write it to any file in the repo.
+
+## Step 3: Ask the questions
 
 Each question has two parts:
 
@@ -58,8 +65,9 @@ Ask the generic part first, wait for the answer, then ask the context-specific p
 - Ask in plain text, one question at a time, and wait for the answer before the next.
 - Do not use the AskUserQuestion tool.
 - Absolutely no hints, options, or example answers.
+- Do not grade, react to, or correct any answer until every question has been answered.
 
-## Step 3: Record the results
+## Step 4: Record the results
 
 1. **File name:** `comp_check_[branch name].md` at the repo root, with `/` replaced by `-`.
 2. **Header:**
@@ -77,4 +85,39 @@ Ask the generic part first, wait for the answer, then ask the context-specific p
    A: ....
    ```
    Record questions exactly as asked and answers exactly as typed.
-   Note: Write as you go: append each pair right after it's answered.
+
+Note: write as you go; append each pair right after it's answered.
+
+## Step 5: Grade
+
+Only after every question has been answered, grade each Q/A pair against the answer key from Step 2.
+
+**Scale:**
+- **0:** wrong or no answer
+- **1:** generic; could describe any code
+- **2:** partially correct; misses a key detail
+- **3:** correct and specific to this code
+
+**Evidence:** for each grade, quote the part of the developer's answer being judged inline, and cite the code (`file:line`) that confirms or contradicts it. If the code is ambiguous and you can't grade confidently, mark the grade as **unsure** and say why.
+
+## Step 6: Give feedback
+
+For each Q/A pair, state what the developer got right, what they missed, and the correct answer, citing `file:line`.
+
+Then:
+
+1. **Append** the grades and feedback to the end of the same `comp_check_[branch name].md` file. Never edit the original Q&A. Use this format:
+   ```
+   ## Grades
+
+   Q1: [score]/3 — [one-line reason with inline evidence]
+   Q2: [score]/3 — [one-line reason with inline evidence]
+   ...
+   Total: [sum]/[max]
+
+   ## Feedback
+
+   Q1: [what was right, what was missed, correct answer with file:line]
+   Q2: ...
+   ```
+2. **Show** the same grades and feedback to the developer in chat.
