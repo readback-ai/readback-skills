@@ -77,6 +77,8 @@ Use the questions above on every branch, adjusted as follows:
 
 ## Step 4: Record the results
 
+Write the file once, in a single write, after the last question has been answered. Don't write to it between questions, so the next question comes right away; keep the Q/A pairs in the conversation until then.
+
 1. **File name:** `comp_check_[branch name].md` at the repo root, with `/` replaced by `-`.
 2. **Header:**
    ```
@@ -93,8 +95,6 @@ Use the questions above on every branch, adjusted as follows:
    A: ....
    ```
    Record questions exactly as asked and answers exactly as typed.
-
-Note: write as you go; append each pair right after it's answered.
 
 ## Step 5: Grade
 
