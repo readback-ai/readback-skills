@@ -43,7 +43,7 @@ Each question has two parts:
 Ask the generic part first, wait for the answer, then ask the context-specific part.
 
 ### What
-- **[generic]** What does it do? Explain the general functionality and then trace what happens from input to output.
+- **[generic]** What does it change? Explain the change and then trace what happens from input to output.
 - **[context-specific]** Pick a specific input from the diff and ask what the code does in that case. Example: "What does `export_csv()` return when the table has zero rows?"
 
 ### Why
@@ -60,6 +60,14 @@ Ask the generic part first, wait for the answer, then ask the context-specific p
 ### Side effects
 - **[generic]** Besides its main purpose, what else does this change do? Does it modify existing functions, change shared settings or data, or touch files outside the feature?
 - Goal: check that the developer knows whether the agent changed code beyond their main request, perhaps unnecessarily.
+
+### Adjusting for the branch type
+Use the questions above on every branch, adjusted as follows:
+- **Bug fix:** for What, ask: "What was the bug, what caused it, and what does the fix change?" Skip Why unless the fix involves a real design choice (e.g. it changes an interface, adds a retry or fallback, works around a library bug instead of fixing it, or changes a data format).
+- **Performance:** for What, ask how much it improves performance and where. Ask for the input-to-output trace only if it helps explain the improvement. For Failure, ask what it could break, if anything.
+- **Refactor:** for What, ask what was refactored. For Failure, ask what it could break, if anything.
+- **Config, dependencies, or infra:** for What, ask only what it changes; skip the input-to-output trace.
+- **Low-logic** (docs-only, formatting-only, reverts, lockfile or generated files only, pure renames or moves, copy/text changes, assets): skip the questions above and ask one question: "What does this change, and does anything else depend on it?"
 
 ### Asking rules
 - Ask in plain text, one question at a time, and wait for the answer before the next.
