@@ -109,7 +109,7 @@ Ask the questions from the key subagent's reply, exactly as written and in order
 
 Write the file once, in a single write, after the last question has been answered. Don't write to it between questions, so the next question comes right away; keep the Q/A pairs in the conversation until then.
 
-1. **File name:** `comp_check_[branch name].md` at the repo root, with `/` replaced by `-`.
+1. **File name:** `comp_checks/comp_check_[branch name].md` at the repo root, with `/` replaced by `-`. If `comp_checks/` doesn't exist, create it with a `.gitignore` file inside containing `*`, so git ignores the whole folder.
 2. **Header:**
    ```
    # Comprehension check: [branch name]
