@@ -47,7 +47,17 @@ Start the key subagent. Give it the branch name, `BASE`, `KEY_PATH`, and the ins
 > 4. **Callers:** for each added or modified function, class, or method, search the repo for where it's called, excluding its own definition.
 > 5. **Dependencies:** for the key changed functions, open the definitions of functions they call when needed to understand an assumption or invariant.
 >
-> #### 2. Write the questions
+> #### 2. Map the change
+>
+> Step back from the individual lines and write down:
+>
+> - the major components the change touches, and what each one does;
+> - how they connect, and how data moves between them;
+> - the key design decisions that aren't obvious and have a big impact on the code.
+>
+> Write the questions from this map.
+>
+> #### 3. Write the questions
 >
 > Each question has two parts:
 >
@@ -56,17 +66,19 @@ Start the key subagent. Give it the branch name, `BASE`, `KEY_PATH`, and the ins
 >
 > List each generic question as its own numbered question, with its context-specific follow-up as the next number.
 >
+> A question doesn't have to point at a single line. It can refer to a whole function or block, or to a set of connected code across several files. Edge-case questions are fine, but each should tie back to a design decision from the map.
+>
 > **What**
 > - **[generic]** What does it change? Explain the change and then trace what happens from input to output.
-> - **[context-specific]** Pick a specific input from the diff and ask what the code does in that case. Example: "What does `export_csv()` return when the table has zero rows?"
+> - **[context-specific]** Pick a specific input from the diff and ask what the code does in that case. Example: "Where does the export get its data, and which component decides what an 'empty' export means?"
 >
 > **Why**
 > - **[generic]** Why this design over reasonable alternatives? Explain key design decisions.
-> - **[context-specific]** Pick a specific design choice in the diff and name a real alternative. Example: "Why does it load all rows into memory instead of streaming them?"
+> - **[context-specific]** Pick a specific design choice in the diff and name a real alternative. Example: "Why does the export run as a background job instead of during the request?"
 >
 > **Failure**
 > - **[generic]** How can it fail? What would the user see?
-> - **[context-specific]** Pick a specific edge case or changed assumption and ask what happens. Example: "What happens if a cell contains a newline?"
+> - **[context-specific]** Pick a specific edge case or changed assumption and ask what happens. Example: "If an export is interrupted halfway, what does the user end up with?"
 >
 > **Upstream Dependency**
 > - **[generic]** What key invariants, assumptions, or functions does it rely on?
@@ -82,14 +94,14 @@ Start the key subagent. Give it the branch name, `BASE`, `KEY_PATH`, and the ins
 > - **Config, dependencies, or infra:** for What, ask only what it changes; skip the input-to-output trace.
 > - **Low-logic** (docs-only, formatting-only, reverts, lockfile or generated files only, pure renames or moves, copy/text changes, assets): skip the questions above and ask one question: "What does this change, and does anything else depend on it?"
 >
-> #### 3. Write the answer key
+> #### 4. Write the answer key
 >
 > Write the ideal answer to each question.
 >
-> - Base each ideal answer on the code itself, citing `file:line` for every claim.
+> - Base each ideal answer on the code itself, and cite the code for every claim. One answer can use several citations, and a citation can be a single line (`file:line`) or a range or whole block (`file:start-end`).
 > - Write the numbered questions and their ideal answers to `KEY_PATH`, creating the folder if it's missing. Never write the key to any file in the repo.
 >
-> #### 4. Reply
+> #### 5. Reply
 >
 > Reply with only the numbered questions, in the order they should be asked. No answers, no code excerpts, no file paths.
 
