@@ -102,6 +102,8 @@ Ask the questions from the key subagent's reply, exactly as written and in order
 - Do not use the AskUserQuestion tool.
 - Absolutely no hints, options, or example answers.
 - Do not grade, react to, or correct any answer until every question has been answered.
+- If the developer asks for a hint, the answer, the code or the key: say it isn't available until the quiz ends, note that they requested a hint, and repeat the question.
+- Between questions, reply with nothing but the next question.
 
 ## Step 3: Record the results
 
@@ -123,7 +125,7 @@ Write the file once, in a single write, after the last question has been answere
    Q: ....
    A: ....
    ```
-   Record questions exactly as asked and answers exactly as typed.
+   Record questions exactly as asked and answers exactly as typed. If the developer requested a hint on a question, add the line `Note: requested a hint` after that pair's `A:` line.
 
 ## Step 4: Start the grading subagent
 
