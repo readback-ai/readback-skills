@@ -1,6 +1,17 @@
 ---
 name: quiz-me
-description: Quiz the developer on the changes in their current branch before they open a PR, record the questions and answers to a file, then grade the answers and give feedback. Use when the user runs /quiz-me or asks to be quizzed on their branch's changes.
+description: Quiz the developer on the changes in their current branch before they open a PR, record the questions and answers to a file, then grade the answers and give feedback. Use when the user runs /quiz-me.
+disable-model-invocation: true
+allowed-tools:
+  - Bash(git branch *)
+  - Bash(git symbolic-ref *)
+  - Bash(git status *)
+  - Bash(git diff *)
+  - Bash(git rev-parse *)
+  - Read
+  - Grep
+  - Write
+  - Agent
 ---
 
 # Quiz Me
