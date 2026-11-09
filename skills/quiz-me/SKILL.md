@@ -99,6 +99,11 @@ Start the key subagent. Give it the branch name, `BASE`, `KEY_PATH`, and the ins
 > - **Config, dependencies, or infra:** for What, ask only what it changes; skip the input-to-output trace.
 > - **Low-logic** (docs-only, formatting-only, reverts, lockfile or generated files only, pure renames or moves, copy/text changes, assets): skip the questions above and ask one question: "What does this change, and does anything else depend on it?"
 >
+> **Adjusting for the size of the change.** After the branch-type rules, scale the quiz to the size of the change. Judge size by how much logic changed (the components, behaviors and design decisions in your map), not by line count. Scale two things: the number of questions and their altitude. Combine questions that overlap, and skip any that add nothing. For example:
+> - **Small** (a one-function bug fix): a few questions; one concrete edge-case question is fine.
+> - **Mid-sized** (a change across a couple of functions or one module): about half the questions.
+> - **Large** (several modules or a new feature): all the questions, design-level only.
+>
 > #### 4. Write the answer key
 >
 > Write the ideal answer to each question.
