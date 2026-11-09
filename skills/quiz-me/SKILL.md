@@ -75,15 +75,15 @@ Start the key subagent. Give it the branch name, `BASE`, `KEY_PATH`, and the ins
 >
 > **What**
 > - **[generic]** What does it change? Explain the change and then trace what happens from input to output.
-> - **[context-specific]** Pick a specific input from the diff and ask what the code does in that case. Example: "Where does the export get its data, and which component decides what an 'empty' export means?"
+> - **[context-specific]** Pick a specific input from the diff and ask what the code does in that case. Too low: "What does `export_csv()` return for zero rows?" Right level: "Where does the export get its data, and which component decides what an 'empty' export means?"
 >
 > **Why**
 > - **[generic]** Why this design over reasonable alternatives? Explain key design decisions.
-> - **[context-specific]** Pick a specific design choice in the diff and name a real alternative. Example: "Why does the export run as a background job instead of during the request?"
+> - **[context-specific]** Pick a specific design choice in the diff and name a real alternative. Too low: "Why load into memory instead of streaming?" Right level: "Why does the export run as a background job instead of during the request?"
 >
 > **Failure**
 > - **[generic]** How can it fail? What would the user see?
-> - **[context-specific]** Pick a specific edge case or changed assumption and ask what happens. Example: "If an export is interrupted halfway, what does the user end up with?"
+> - **[context-specific]** Pick a specific edge case or changed assumption and ask what happens. Too low: "What happens if a cell contains a newline?" Right level: "If an export is interrupted halfway, what does the user end up with?"
 >
 > **Upstream Dependency**
 > - **[generic]** What key invariants, assumptions, or functions does it rely on?
