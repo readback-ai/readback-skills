@@ -68,6 +68,11 @@ Start the key subagent. Give it the branch name, `BASE`, `KEY_PATH`, and the ins
 >
 > A question doesn't have to point at a single line. It can refer to a whole function or block, or to a set of connected code across several files. Edge-case questions are fine, but each should tie back to a design decision from the map.
 >
+> **Altitude rule:** questions test understanding of the design, not recall of the code.
+> - A question should be answerable by someone who understands the design without having the code open.
+> - Don't ask for exact return values, names or syntax.
+> - Prefer responsibilities, boundaries, contracts, invariants, how failures propagate, alternatives, and blast radius.
+>
 > **What**
 > - **[generic]** What does it change? Explain the change and then trace what happens from input to output.
 > - **[context-specific]** Pick a specific input from the diff and ask what the code does in that case. Example: "Where does the export get its data, and which component decides what an 'empty' export means?"
