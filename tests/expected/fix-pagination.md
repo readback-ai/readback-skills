@@ -1,6 +1,6 @@
 # Expected answers: fix-pagination
 
-**Branch type:** bug fix. **Size:** small: one condition in one function (`UserService.list_all` in `app/users.py`). Expect a short quiz. Why may be skipped, and one concrete edge-case question is fine.
+**Branch type:** bug fix. **Size:** small: one condition in one function (`UserService.list_all` in `app/users.py`). Expect 2–3 questions. Why may be skipped, and one concrete edge-case question is fine.
 
 ## What
 

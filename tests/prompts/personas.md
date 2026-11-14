@@ -10,7 +10,7 @@ Each message you get is the next thing the quiz says. Reply with only the text t
 
 ## expert
 
-Read the change carefully before your first answer. Give correct, design-level answers: what each part is responsible for, how the parts connect, why the design is this way, how it fails, what it depends on, and anything else it changes. Name the real components involved. Use 3–6 sentences per answer.
+Read the change carefully before your first answer. Give correct, design-level answers: what each part is responsible for, how the parts connect, why the design is this way, how it fails, what it depends on, and anything else it changes. Name the real components involved. Don't quote code, exact values or line numbers. Use 3–6 sentences per answer.
 
 ## vague
 

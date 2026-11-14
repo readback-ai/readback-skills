@@ -110,16 +110,21 @@ Start the key subagent. Give it the branch name, `BASE`, `KEY_PATH`, and the ins
 > - **Config, dependencies, or infra:** for What, ask only what it changes; skip the input-to-output trace.
 > - **Low-logic** (docs-only, formatting-only, reverts, lockfile or generated files only, pure renames or moves, copy/text changes, assets): skip the questions above and ask one question: "What does this change, and does anything else depend on it?"
 >
-> **Adjusting for the size of the change.** After the branch-type rules, scale the quiz to the size of the change. Judge size by how much logic changed (the components, behaviors and design decisions in your map), not by line count. Scale two things: the number of questions and their altitude. Combine questions that overlap, and skip any that add nothing. For example:
-> - **Small** (a one-function bug fix): a few questions; one concrete edge-case question is fine.
-> - **Mid-sized** (a change across a couple of functions or one module): about half the questions.
-> - **Large** (several modules or a new feature): all the questions, design-level only.
+> **Adjusting for the size of the change.** After the branch-type rules, decide the size of the change by how much logic changed (the components, behaviors and design decisions in your map), not by line count. The size sets how many questions to ask, with each follow-up counted as its own question:
+> - **Low-logic** (see above): 1 question.
+> - **Small** (e.g. a one-function bug fix): 2–3 questions. One concrete edge-case question is fine.
+> - **Mid-sized** (e.g. a change across a couple of functions or one module): 4–5 questions.
+> - **Large** (e.g. a feature that spans several modules): 6–8 questions, design-level only.
+>
+> To fit the range, combine questions that overlap and drop the ones that add least.
 >
 > #### 4. Write the answer key
 >
 > Write the ideal answer to each question.
 >
-> - Base each ideal answer on the code itself, and cite the code for every claim. One answer can use several citations, and a citation can be a single line (`file:line`) or a range or whole block (`file:start-end`).
+> - Start the key with the line `Size: <low-logic|small|mid-sized|large>, because <one-line reason>`.
+> - Write each ideal answer as 1–4 main points: what someone who understands the change would say. Keep each point to one short line. Go above 4 only when the change truly needs it. Otherwise, split the question or drop points.
+> - Base each ideal answer on the code itself, and cite the code for every main point. A citation can be a single line (`file:line`) or a range or whole block (`file:start-end`).
 > - Write the numbered questions and their ideal answers to `KEY_PATH`, creating the folder if it's missing. Never write the key to any file in the repo.
 >
 > #### 5. Reply
@@ -175,14 +180,16 @@ Only after every question has been answered and the results file is written, sta
 > **Scale:**
 > - **0:** wrong or no answer
 > - **1:** generic; could describe any code
-> - **2:** partially correct; misses a key detail
-> - **3:** correct and specific to this code
+> - **2:** gets some of the main points, misses at least one
+> - **3:** correct and specific to this change's design
 >
-> **Evidence:** for each grade, quote the part of the developer's answer being judged inline, and cite the code (`file:line`) that confirms or contradicts it. If the code is ambiguous and you can't grade confidently, mark the grade as **unsure** and say why.
+> Grade on the main points only. A main point stated in the developer's own words gets full credit. Missing an exact name, value or syntax rarely costs points: only when someone who understands the change would know it without the code open, because it matters to the design.
+>
+> **Evidence:** for each grade, quote a short part of the developer's answer being judged, and cite the code (`file:line`) that confirms or contradicts it. If the code is ambiguous and you can't grade confidently, mark the grade as **unsure** and say why.
 >
 > #### 2. Give feedback
 >
-> For each Q/A pair, state what the developer got right, what they missed, and the correct answer, citing `file:line`.
+> For each Q/A pair, write at most two lines: what the developer missed and the correct point, with one `file:line` citation. Say nothing about what was right. If nothing was missed, write `Nothing missed.`
 >
 > #### 3. Write and reply
 >
@@ -190,14 +197,14 @@ Only after every question has been answered and the results file is written, sta
 > ```
 > ## Grades
 >
-> Q1: [score]/3 — [one-line reason with inline evidence]
-> Q2: [score]/3 — [one-line reason with inline evidence]
+> Q1: [score]/3 — [one line: a short quote from the answer and one file:line]
+> Q2: [score]/3 — [one line: a short quote from the answer and one file:line]
 > ...
 > Total: [sum]/[max]
 >
 > ## Feedback
 >
-> Q1: [what was right, what was missed, correct answer with file:line]
+> Q1: [what was missed and the correct point, file:line]
 > Q2: ...
 > ```
 > Then reply with exactly the text you appended.
