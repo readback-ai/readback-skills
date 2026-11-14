@@ -1,6 +1,6 @@
 # Expected answers: refactor-transport
 
-**Branch type:** refactor. **Size:** mid-sized: two modules (`app/http.py` replaced by `app/transport.py`, and `app/api_client.py`). Expect about half the questions. For What, ask what was refactored; for Failure, ask what it could break.
+**Branch type:** refactor. **Size:** mid-sized: two modules (`app/http.py` replaced by `app/transport.py`, and `app/api_client.py`). Expect 4–5 questions. For What, ask what was refactored; for Failure, ask what it could break.
 
 ## What
 
