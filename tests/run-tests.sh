@@ -6,14 +6,18 @@
 #   Default: all five personas on add-response-cache, the expert persona on the
 #   other branches, 3 runs each. --branch and --persona narrow that down.
 #
+# Up to MAX_PARALLEL cases run at once. Each case gets its own fixture repo,
+# deleted when the case ends.
+#
 # Results go to tests/runs/<date>/ (git ignores this folder). The temp fixture
-# repo and the answer keys this session created are deleted at the end.
+# repos and the answer keys this session created are deleted at the end.
 set -euo pipefail
 
 TESTS_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROMPTS="$TESTS_DIR/prompts"
 KEY_DIR="$HOME/.readback/answer_keys"
 MAX_TURNS=15
+MAX_PARALLEL=4
 ALL_PERSONAS="expert vague wrong hint-seeker override"
 MAIN_CASE="add-response-cache"
 
@@ -78,30 +82,39 @@ persona_say() {  # persona_say <session id or ""> <message>
 
 log() { echo "[$(date +%H:%M:%S)] $*" >&2; }
 
-# --- build the fixture and set up cleanup ----------------------------------
+# --- set up cleanup and list the cases -------------------------------------
 
-FIXTURE="$(mktemp -d)"
-KEY_FILES=()
+# Each case builds its fixture at $FIXTURE_ROOT/<case #> and adds its answer
+# key path to $FIXTURE_ROOT/keys, so cleanup can find both.
+FIXTURE_ROOT="$(mktemp -d)"
+SESSION_START="$(date +%s)"
+
+# Job control gives each case its own process group, so cleanup can stop a
+# case along with its claude calls without touching whatever started this script.
+set -m
 
 cleanup() {
+  for pid in $(jobs -p); do kill -TERM -- "-$pid" 2>/dev/null || true; done
+  wait 2>/dev/null || true
   # Delete only the exact key files built from this session's fixture commits.
-  for f in ${KEY_FILES[@]+"${KEY_FILES[@]}"}; do rm -f -- "$f"; done
-  if [ -n "${FIXTURE:-}" ] && [ -d "$FIXTURE" ]; then rm -rf -- "$FIXTURE"; fi
+  if [ -f "$FIXTURE_ROOT/keys" ]; then
+    while IFS= read -r f; do rm -f -- "$f"; done < "$FIXTURE_ROOT/keys"
+  fi
+  rm -rf -- "$FIXTURE_ROOT"
 }
 trap cleanup EXIT
 
-bash "$TESTS_DIR/make-fixture.sh" "$FIXTURE" >/dev/null
 mkdir -p "$KEY_DIR"
 
+# Fixture branches are the folders in tests/branches/, except base (main).
 all_branches=()
-while IFS= read -r b; do
-  [ "$b" = main ] && continue
-  all_branches+=("$b")
-  KEY_FILES+=("$(key_path "$b")")
-done < <(git -C "$FIXTURE" for-each-ref --format='%(refname:short)' refs/heads/)
+for dir in "$TESTS_DIR"/branches/*/; do
+  b="$(basename "$dir")"
+  [ "$b" = base ] || all_branches+=("$b")
+done
 
 if [ -n "$branch_filter" ]; then
-  git -C "$FIXTURE" rev-parse --verify -q "$branch_filter" >/dev/null \
+  [[ " ${all_branches[*]} " == *" $branch_filter "* ]] \
     || { echo "No fixture branch named $branch_filter" >&2; exit 1; }
   branches=("$branch_filter")
 else
@@ -198,21 +211,60 @@ Persona: $2" --output-format json --allowedTools "${JUDGE_TOOLS[@]}")"; then
   fi
 }
 
+elapsed() {  # elapsed <seconds>: print as "Xm Ys"
+  echo "$(($1 / 60))m $(($1 % 60))s"
+}
+
+# --- one case: its own fixture, the quiz, the judge -----------------------
+
+run_case() {  # run_case <case #> <branch> <persona> <n>
+  local i="$1" b="$2" p="$3" n="$4" start=$SECONDS key
+  # Runs in the background, so this FIXTURE is only this case's.
+  FIXTURE="$FIXTURE_ROOT/$i"
+
+  # Repos built in the same second would get the same commit SHAs, and so the
+  # same answer key path. Dating each case's commits SESSION_START + i keeps
+  # them apart.
+  local date="$((SESSION_START + i)) +0000"
+  if ! GIT_AUTHOR_DATE="$date" GIT_COMMITTER_DATE="$date" \
+      bash "$TESTS_DIR/make-fixture.sh" "$FIXTURE" >/dev/null; then
+    mkdir -p "$RUN_DIR/$b/$p-$n"
+    echo "Couldn't build the fixture repo." >> "$RUN_DIR/$b/$p-$n/errors.log"
+    log "$b / $p / run $n: failed to build fixture"
+    return 0
+  fi
+  key="$(key_path "$b")"
+  echo "$key" >> "$FIXTURE_ROOT/keys"
+
+  run_one "$b" "$p" "$n"
+  judge_one "$b" "$p" "$n"
+
+  rm -rf -- "$FIXTURE"
+  rm -f -- "$key"
+  log "$b / $p / run $n: done in $(elapsed $((SECONDS - start)))"
+}
+
 # --- main ------------------------------------------------------------------
 
-log "Fixture built at $FIXTURE"
 log "Results will go to $RUN_DIR"
 
+i=0
 for b in "${branches[@]}"; do
   for p in $(personas_for "$b"); do
     for n in $(seq 1 "$runs"); do
-      log "$b / $p / run $n: quiz"
-      run_one "$b" "$p" "$n"
-      log "$b / $p / run $n: judge"
-      judge_one "$b" "$p" "$n"
+      # Wait for a free spot. (wait -n doesn't count jobs that already ended,
+      # so check the running count first.)
+      while [ "$(jobs -rp | wc -l)" -ge "$MAX_PARALLEL" ]; do wait -n || true; done
+      i=$((i + 1))
+      log "$b / $p / run $n: started (case $i)"
+      # No stdin: with job control on, a background case would otherwise share
+      # the terminal, and claude waits 3s for stdin when it isn't a terminal.
+      run_case "$i" "$b" "$p" "$n" </dev/null &
     done
   done
 done
+wait || true
+log "All $i cases done in $(elapsed "$SECONDS")"
 
 log "Summarizing"
 if json="$(cd "$RUN_DIR" && claude -p "$(cat "$PROMPTS/summary.md")" --output-format json --allowedTools "${JUDGE_TOOLS[@]}")"; then
