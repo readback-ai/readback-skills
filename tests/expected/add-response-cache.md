@@ -1,6 +1,6 @@
 # Expected answers: add-response-cache
 
-**Branch type:** feature. **Size:** large: a new module (`app/cache.py`) plus changes to `app/api_client.py` and `app/config.py`. Expect 6–8 questions, all design-level.
+**Branch type:** feature. **Size:** mid-sized: one new module (`app/cache.py`) wired into one client (`app/api_client.py`), plus a config change. Expect 4–5 questions, all design-level.
 
 ## What
 
