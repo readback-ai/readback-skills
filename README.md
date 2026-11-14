@@ -22,10 +22,10 @@ It asks about the change on the current branch:
 4. **What does it depend on?**
 5. **What else does it change** besides its main purpose?
 
-The first three each get a follow-up specific to the change. Questions focus on design, not exact code, and their number and altitude scale with the size and type of the change.
+The first three each get a follow-up specific to the change. Questions focus on design, not exact code. Their number scales with the size and type of the change, from 1 for a docs-only change to 8 for a large feature.
 
 - **Answer protection:** a subagent writes the questions and answer key to `~/.readback/answer_keys/`, outside the repo. The agent asking the questions never sees the key or the code. Hint requests are declined and noted in the record.
-- **Grading:** a separate subagent grades each answer 0–3 and adds feedback.
+- **Grading:** a separate subagent grades each answer 0–3 on its main points, not on exact names or values, and adds a line or two on what was missed.
 - **Output:** `comp_checks/comp_check_<branch>.md`, in a folder the skill makes git ignore.
 
 ## Roadmap
