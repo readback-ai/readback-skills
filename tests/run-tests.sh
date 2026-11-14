@@ -13,12 +13,12 @@ set -euo pipefail
 TESTS_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROMPTS="$TESTS_DIR/prompts"
 KEY_DIR="$HOME/.readback/answer_keys"
-MAX_TURNS=25
+MAX_TURNS=15
 ALL_PERSONAS="expert vague wrong hint-seeker override"
 MAIN_CASE="add-response-cache"
 
 # The quiz session needs git, file access, subagents, and write access to the key folder.
-QUIZ_TOOLS=("Bash(git *)" Read Grep Glob Write Agent Task)
+QUIZ_TOOLS=("Bash(git *)" Read Grep Glob Write Edit Agent Task)
 # The persona plays the developer: it can read the code, never the answer key.
 PERSONA_TOOLS=("Bash(git diff *)" "Bash(git log *)" "Bash(git show *)" Read Grep Glob)
 PERSONA_DENY=("Read(~/.readback/**)")
@@ -65,7 +65,9 @@ key_path() {
 quiz_say() {  # quiz_say <session id or ""> <message>
   local args=(-p "$2" --output-format json --add-dir "$HOME/.readback")
   [ -n "$1" ] && args+=(--resume "$1")
-  (cd "$FIXTURE" && claude "${args[@]}" --allowedTools "${QUIZ_TOOLS[@]}")
+  # On Windows, Git Bash rewrites arguments that start with "/" into Windows
+  # paths, which turns "/quiz-me" into "C:/Program Files/Git/quiz-me".
+  (cd "$FIXTURE" && MSYS2_ARG_CONV_EXCL="/quiz-me" claude "${args[@]}" --allowedTools "${QUIZ_TOOLS[@]}")
 }
 
 persona_say() {  # persona_say <session id or ""> <message>
@@ -144,6 +146,14 @@ $(section "$PROMPTS/personas.md" "$p")"
   local json msg answer prompt qs="" ps="" turn=0
   if ! json="$(quiz_say "" "/quiz-me")"; then echo "The first quiz call failed." >> "$out/errors.log"; return 0; fi
   qs="$(json_get session_id "$json")"; msg="$(json_get result "$json")"
+
+  # The key subagent writes the key before the first question. No key means
+  # the skill didn't start, so stop instead of chatting for MAX_TURNS.
+  if [ ! -f "$key" ]; then
+    printf '\n### Quiz\n\n%s\n' "$msg" >> "$transcript"
+    echo "quiz-me didn't start: no answer key after the first reply." >> "$out/errors.log"
+    return 0
+  fi
 
   while :; do
     printf '\n### Quiz\n\n%s\n' "$msg" >> "$transcript"
