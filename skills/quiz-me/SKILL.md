@@ -28,7 +28,7 @@ The work is split across three roles so the conversation with the developer neve
 
 Start both subagents with the Agent tool as `general-purpose` subagents, not forks, so they don't inherit this conversation.
 
-As the main agent, never read the changed source files, the `git diff` output, or the answer key file. You can't leak what you never saw.
+As the main agent, never read the changed source files, the `git diff` output, or the answer key file.
 
 In the commands below, `BASE` means the base branch found in Step 0.
 
@@ -37,7 +37,7 @@ In the commands below, `BASE` means the base branch found in Step 0.
 1. **Get the current branch:** `git branch --show-current`. If it's empty (detached HEAD) or is the base branch itself, tell the user to switch to their feature branch and stop.
 2. **Find the base branch:** try `git symbolic-ref refs/remotes/origin/HEAD`. If that fails, use `main` if it exists, else `master`. If neither exists, ask the user.
 3. **Check for uncommitted work:** `git status --porcelain`. If there's any output, list the files and ask: "These changes aren't committed and won't be included in the quiz. Commit them first, or continue anyway?"
-4. **Check there's something to quiz on:** run `git diff --quiet BASE...HEAD`. It prints nothing; exit code 0 means there are no changes, so tell the user and stop.
+4. **Check there's something to quiz on:** run `git diff --quiet BASE...HEAD`. It prints nothing. If the exit code is 0, there are no changes: tell the user and stop.
 5. **Set the key path:** get the short commit hash with `git rev-parse --short HEAD`. The answer key goes in `~/.readback/answer_keys/[branch name]-[short hash].md`, with `/` in the branch name replaced by `-`. Call this `KEY_PATH`.
 
 ## Step 1: Start the key subagent
@@ -70,7 +70,7 @@ Start the key subagent. Give it the branch name, `BASE`, `KEY_PATH`, and the ins
 >
 > #### 3. Write the questions
 >
-> Each question has two parts:
+> Most questions have two parts:
 >
 > - **[generic]:** the base question, worded roughly the same on every branch.
 > - **[context-specific]:** a follow-up you build from the context above, naming a real input, choice, or edge case from this diff.
@@ -136,7 +136,7 @@ Ask the questions from the key subagent's reply, exactly as written and in order
 - Absolutely no hints, options, or example answers.
 - Do not grade, react to, or correct any answer until every question has been answered.
 - If the developer asks for a hint, the answer, the code or the key: say it isn't available until the quiz ends, note that they requested a hint, and repeat the question.
-- Between questions, reply with nothing but the next question.
+- Apart from declining hint requests, reply with nothing but the next question.
 
 ## Step 3: Record the results
 
