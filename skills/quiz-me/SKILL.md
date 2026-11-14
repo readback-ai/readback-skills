@@ -114,7 +114,7 @@ Start the key subagent. Give it the branch name, `BASE`, `KEY_PATH`, and the ins
 > - **Low-logic** (see above): 1 question.
 > - **Small** (e.g. a one-function bug fix): 2–3 questions. One concrete edge-case question is fine.
 > - **Mid-sized** (e.g. a change across a couple of functions or one module): 4–5 questions.
-> - **Large** (e.g. several modules or a new feature): 6–8 questions, design-level only.
+> - **Large** (e.g. a feature that spans several modules): 6–8 questions, design-level only.
 >
 > To fit the range, combine questions that overlap and drop the ones that add least.
 >
