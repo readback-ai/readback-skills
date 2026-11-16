@@ -1,0 +1,1 @@
+Quiz me on the changes in my current branch, so I can check I understand them before I open a PR. Ask one question at a time and wait for my answer. When you're done, score each answer out of 3, then end with a line `Total: X/Y`.
