@@ -44,7 +44,7 @@ Steps 2–4 are optional. They add a hook that brings up the quiz when the agent
 Either way the PR goes through once a graded quiz exists for the current commit.
 
 2. (Optional) Pick a settings file from the table below and open it, creating it if it doesn't exist:
-   - In VS Code: press `Ctrl+P` and paste the file's path, such as `~/.claude/settings.json` (on Windows, `C:\Users\<you>\.claude\settings.json`).
+   - In VS Code: press `Ctrl+P` and paste the file's path, such as `~/.claude/settings.json`.
    - From a terminal: run `code ~/.claude/settings.json`.
 3. (Optional) Add the snippet below. If the file already has `env` or `hooks`, merge these in rather than replacing them.
 4. (Optional) Start a new Claude Code session.
