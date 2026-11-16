@@ -1,5 +1,6 @@
 ---
 name: quiz-me
+version: 1.0.0
 description: Quiz the developer on the changes in their current branch before they open a PR, record the questions and answers to a file, then grade the answers and give feedback. Use when the user runs /quiz-me.
 disable-model-invocation: true
 allowed-tools:
@@ -199,6 +200,8 @@ Only after every question has been answered and the results file is written, sta
 > ```
 > ## Grades & Feedback
 >
+> **Size: [the size from the first line of the answer key, e.g. mid-sized]**
+>
 > **Q1: [score]/3**: [feedback]
 >
 > **Q2: [score]/3**: [feedback]
@@ -212,3 +215,41 @@ Only after every question has been answered and the results file is written, sta
 ## Step 5: Show the feedback
 
 Show the grading subagent's reply to the developer in chat, unchanged.
+
+## Step 6: Ask the developer to rate the quiz
+
+In the same message as the grades from Step 5, below them, ask the developer to rate the quiz itself:
+
+```
+Rate this quiz? Replying sends these ratings to the quiz-me maintainers, never your code. Reply "n" to skip and send nothing.
+Reply like "3 y 4,6 - y" plus any notes:
+  Length                          1 too short · 3 just right · 5 too long
+  Graded fairly?                  y/n
+  Frivolous or unfair questions?  numbers, or -
+  Confusing questions?            numbers, or -
+  Caught something you'd missed?  y/n
+```
+
+If the developer replies "n", or their reply isn't a rating (for example, a new request), drop the rating and carry on. Otherwise:
+
+1. **Write the rating file:** `comp_checks/feedback/[branch name].txt`, with `/` in the branch name replaced by `-`, creating the folder if it's missing. Leave a field blank if the developer didn't answer it. Use exactly these lines:
+   ```
+   version: [version from this skill's frontmatter]
+   model: [your model ID]
+   size: [Size from the Grades & Feedback section]
+   questions: [number of questions asked]
+   score: [Total from the Grades & Feedback section, e.g. 11/15]
+   hints: [number of questions with a hint request]
+   length: [1-5]
+   graded_fairly: [y/n]
+   frivolous: [question numbers, or -]
+   confusing: [question numbers, or -]
+   caught_something: [y/n]
+   notes: [the developer's notes, as typed, on one line]
+   ```
+   Never put code, file paths, branch names, questions or answers in this file, apart from what the developer typed as notes.
+2. **Send it** from the repo root with exactly this command, changing only the file name:
+   ```
+   curl -sS --data-urlencode "entry.1916269948@comp_checks/feedback/[branch name].txt" https://docs.google.com/forms/d/e/1FAIpQLSdXT6ihPXWKAE0WlASoXfdm8NoZvGFvBuVzMwVQdkzec7xk6w/formResponse -o /dev/null -w "%{http_code}\n"
+   ```
+   Depending on their permission settings, Claude Code may ask the developer to approve the command. A `200` means it was sent: say "Thanks, rating sent." If they decline or it fails, say the rating is saved in the file and show the command so they can send it later.
