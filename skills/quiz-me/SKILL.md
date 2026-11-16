@@ -185,27 +185,27 @@ Only after every question has been answered and the results file is written, sta
 >
 > Grade on the main points only. A main point stated in the developer's own words gets full credit. Missing an exact name, value or syntax rarely costs points: only when someone who understands the change would know it without the code open, because it matters to the design.
 >
-> **Evidence:** for each grade, quote a short part of the developer's answer being judged, and cite the code (`file:line`) that confirms or contradicts it. If the code is ambiguous and you can't grade confidently, mark the grade as **unsure** and say why.
+> **Evidence:** for each grade, find the part of the developer's answer being judged and the code (`file:line`) that confirms or contradicts it. This is your working: don't quote the answer back in the output. If the code is ambiguous and you can't grade confidently, mark the grade as **unsure** and say why.
 >
 > #### 2. Give feedback
 >
-> For each Q/A pair, write at most two lines: what the developer missed and the correct point, with one `file:line` citation. Say nothing about what was right. If nothing was missed, write `Nothing missed.`
+> For each Q/A pair, write feedback that is usually one line:
+> - **Below 3/3:** briefly say what the developer got wrong or missed and the correct point, with a `file:line` citation for each miss. Go past one line only when there are several misses to cover.
+> - **3/3:** write `Correct.` and briefly mention what the developer said.
 >
 > #### 3. Write and reply
 >
-> **Append** the grades and feedback to the end of the results file. Never edit the header or the original Q&A. Use this format:
+> **Append** the grades and feedback to the end of the results file. Never edit the header or the original Q&A. Use this format, with a blank line between questions so each one renders on its own:
 > ```
-> ## Grades
+> ## Grades & Feedback
 >
-> Q1: [score]/3 — [one line: a short quote from the answer and one file:line]
-> Q2: [score]/3 — [one line: a short quote from the answer and one file:line]
+> **Q1: [score]/3**: [feedback]
+>
+> **Q2: [score]/3**: [feedback]
+>
 > ...
-> Total: [sum]/[max]
 >
-> ## Feedback
->
-> Q1: [what was missed and the correct point, file:line]
-> Q2: ...
+> **Total: [sum]/[max]**
 > ```
 > Then reply with exactly the text you appended.
 

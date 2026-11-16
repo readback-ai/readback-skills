@@ -69,7 +69,7 @@ class Run:
             results = read(folder / "results.md")
             self.total = last_total(results)
             if results:
-                body = section(results, "Grades") + section(results, "Feedback")
+                body = section(results, "Grades & Feedback")
                 self.feedback_lines = sum(1 for l in body.splitlines() if l.strip())
             else:
                 self.feedback_lines = None
