@@ -27,6 +27,7 @@ The first three each get a follow-up specific to the change. Questions focus on 
 - **Answer protection:** a subagent writes the questions and answer key to `~/.readback/answer_keys/`, outside the repo. The agent asking the questions never sees the key or the code. Hint requests are declined and noted in the record.
 - **Grading:** a separate subagent grades each answer 0–3 on its main points, not on exact names or values, and adds a line or two on what was missed.
 - **Output:** `comp_checks/comp_check_<branch>.md`, in a folder the skill makes git ignore.
+- **Feedback (optional):** at the end, you can rate the quiz in one line or reply "n" to skip. Replying sends your ratings: they're saved to `comp_checks/feedback/<branch>.txt`, and the agent sends that file to the maintainers' Google Form with `curl`. The file holds your ratings and notes plus the skill version, model, change size, question count, score and number of hints. It never contains code, file paths, branch names, questions or answers. Reply "n" and nothing is sent.
 
 #### Setup (Claude Code)
 
