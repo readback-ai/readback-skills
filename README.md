@@ -90,3 +90,4 @@ skills/
     SKILL.md     # the skill prompt
     README.md    # usage notes
 ```
+
