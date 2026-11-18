@@ -91,3 +91,7 @@ skills/
     README.md    # usage notes
 ```
 
+
+## License
+
+MIT. See [LICENSE](LICENSE).
